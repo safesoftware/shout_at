@@ -2,22 +2,27 @@ require 'spec_helper'
 
 describe ShoutAt do
 
+  before do
+    @logger = Logger.new(STDOUT)
+    allow(Logger).to receive(:new).and_return @logger
+  end
+
   describe '#init' do
 
     let(:init_hash_log) { {'group1' => {'rspec_level' => {'channel' => 'log'}}} }
     let(:init_hash_dummy) { {'group2' => {'rspec_level' => {'channel' => 'dummy'}}} }
 
     it 'should create module and method based on input hash' do
-      expect { ShoutAt::Group1.rspec_level('hello world') }.to raise_exception
+      expect { ShoutAt::Group1.rspec_level('hello world') }.to raise_exception NameError
       ShoutAt.init(init_hash_log)
-      Rails.logger.should_receive(:info).with "Shouter::Group1::RspecLevel: hello world: hello world"
+      expect(@logger).to receive(:info).with "Shouter::Group1::RspecLevel: hello world: hello world"
       ShoutAt::Group1.rspec_level('hello world')
     end
 
     it 'should report to Airbrake if initialization fails' do
-      Airbrake.should_receive(:notify).with do |error|
-        error.message.should eq "Undefined shouter channel dummy"
-        error.should be_an_instance_of ShoutAt::ShoutAtError
+      expect(Airbrake).to receive(:notify) do |error|
+        expect(error.message).to eq "Undefined shouter channel dummy"
+        expect(error).to be_an_instance_of ShoutAt::ShoutAtError
       end
       ShoutAt.init(init_hash_dummy)
     end
@@ -46,6 +51,11 @@ describe ShoutAt do
 
   describe 'EmailShouter' do
     describe '#initialize' do
+
+      before do
+        allow(Object).to receive(:const_get)
+      end
+
       it 'should validate the presence of the recipient email address' do
         expect{ ShoutAt::EmailShouter.new('group', 'level', {}) }.to raise_error ArgumentError, "Recipient email address must be provided for email shouters"
         expect{ ShoutAt::EmailShouter.new('group', 'level', {'to' => ""}) }.to raise_error ArgumentError, "Recipient email address must be provided for email shouters"

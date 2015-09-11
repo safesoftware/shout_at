@@ -1,9 +1,10 @@
 module ShoutAt
   class Shouter
 
-    def initialize(group, level)
+    def initialize(group, level, logger = nil)
       @group = group
       @level = level
+      @logger = logger || Logger.new(STDOUT)
     end
 
     # Global arguments
@@ -15,10 +16,10 @@ module ShoutAt
       @url = args[:url]
       @exception = args[:exception]
       args.delete(:exception)
-      Rails.logger.info "Shouter::#{@group.camelize}::#{@level.camelize}: #{@subject}: #{message}"
-      Rails.logger.warn "Exception: #{@exception}" if @exception
-      Rails.logger.warn @exception.backtrace.join("\n") if @exception && @exception.backtrace
-      Rails.logger.debug "Shouter::#{@group.camelize}::#{@level.camelize}: Args: #{args}"
+      @logger.info "Shouter::#{@group.camelize}::#{@level.camelize}: #{@subject}: #{message}"
+      @logger.warn "Exception: #{@exception}" if @exception
+      @logger.warn @exception.backtrace.join("\n") if @exception && @exception.backtrace
+      @logger.debug "Shouter::#{@group.camelize}::#{@level.camelize}: Args: #{args}"
     end
 
   end
