@@ -19,12 +19,8 @@ describe ShoutAt do
       ShoutAt::Group1.rspec_level('hello world')
     end
 
-    it 'should report to Airbrake if initialization fails' do
-      expect(Airbrake).to receive(:notify) do |error|
-        expect(error.message).to eq "Undefined shouter channel dummy"
-        expect(error).to be_an_instance_of ShoutAt::ShoutAtError
-      end
-      ShoutAt.init(init_hash_dummy)
+    it 'should raise a shoutat error if initialization fails' do
+      expect{ ShoutAt.init(init_hash_dummy) }.to raise_error ShoutAt::ShoutAtError, "Undefined shouter channel dummy"
     end
 
   end
@@ -53,7 +49,8 @@ describe ShoutAt do
     describe '#initialize' do
 
       before do
-        allow(Object).to receive(:const_get)
+        mailer = double(shout: true)
+        allow(Object).to receive(:const_get).and_return mailer
       end
 
       it 'should validate the presence of the recipient email address' do

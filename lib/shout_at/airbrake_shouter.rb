@@ -1,3 +1,5 @@
+require 'airbrake'
+
 module ShoutAt
   class AirbrakeShouter < Shouter
 

@@ -1,7 +1,7 @@
 require "shout_at/version"
 
-require 'airbrake'
 require 'rails'
+require 'active_support/core_ext/module/attribute_accessors'
 require 'shout_at/shouter'
 require 'shout_at/airbrake_shouter'
 require 'shout_at/pagerduty_shouter'
@@ -14,7 +14,8 @@ module ShoutAt
 
   class << self
 
-    def init(opts)
+    def init(opts, logger = nil)
+      Shouter.logger = logger || Logger.new(STDERR)
       opts.each do |group, group_opts|
         # Create new module for target group (e.g. ShoutAt::Support)
         group_module = Module.new
@@ -31,8 +32,6 @@ module ShoutAt
           method_builder(group_module, self.send("#{accessor_name}"), level)
         end
       end
-    rescue => e
-      Airbrake.notify(e)
     end
 
     private
