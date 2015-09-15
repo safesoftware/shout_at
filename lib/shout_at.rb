@@ -15,7 +15,7 @@ module ShoutAt
   class << self
 
     def init(opts, logger = nil)
-      Shouter.logger = logger || Logger.new(STDERR)
+      Shouter.logger = logger || Logger.new(STDOUT)
       opts.each do |group, group_opts|
         # Create new module for target group (e.g. ShoutAt::Support)
         group_module = Module.new

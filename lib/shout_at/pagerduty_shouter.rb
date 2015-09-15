@@ -1,3 +1,5 @@
+require 'pagerduty'
+
 module ShoutAt
   class PagerdutyShouter < Shouter
 

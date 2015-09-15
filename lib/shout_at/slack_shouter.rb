@@ -1,3 +1,5 @@
+require 'slack-notifier'
+
 module ShoutAt
   class SlackShouter < Shouter
 
