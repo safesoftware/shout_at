@@ -15,7 +15,7 @@ module ShoutAt
   class << self
 
     def init(opts, logger = nil)
-      Shouter.logger = logger || Logger.new(STDOUT)
+      Shouter.logger = logger if logger
       opts.each do |group, group_opts|
         # Create new module for target group (e.g. ShoutAt::Support)
         group_module = Module.new
@@ -29,16 +29,31 @@ module ShoutAt
           self.send("#{accessor_name}=", build_shouter(group, level, level_opts))
 
           # Add notification method to group module
-          method_builder(group_module, self.send("#{accessor_name}"), level)
+          method_builder(group_module, self.send("#{accessor_name}"), level, rescue_handler)
         end
+      end
+    end
+
+    def rescue_handler=(proc)
+      @rescue_handler = proc
+    end
+
+    def rescue_handler
+      @rescue_handler ||= Proc.new do |e| 
+        Shouter.logger.error e.message
+        Shouter.logger.error e.backtrace.join("\n")
       end
     end
 
     private
 
-    def method_builder(mod, accessor, level)
+    def method_builder(mod, accessor, level, rescue_handler)
       mod.define_singleton_method level do |message, opts = {}|
-        accessor.shout(message, opts)
+        begin
+          accessor.shout(message, opts)
+        rescue => e
+          rescue_handler.call(e)
+        end
       end
     end
 
