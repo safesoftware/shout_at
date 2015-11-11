@@ -7,10 +7,15 @@ describe ShoutAt do
     allow(Logger).to receive(:new).and_return @logger
   end
 
-  describe '#init' do
+  let(:init_hash_log) { {'group1' => {'rspec_level' => {'channel' => 'log'}}} }
+  let(:init_hash_dummy) { {'group2' => {'rspec_level' => {'channel' => 'dummy'}}} }
+  
+  after do
+    ShoutAt.send(:remove_const, :Group1) if ShoutAt.const_defined?(:Group1)
+    ShoutAt.send(:remove_const, :Group2) if ShoutAt.const_defined?(:Group2)
+  end
 
-    let(:init_hash_log) { {'group1' => {'rspec_level' => {'channel' => 'log'}}} }
-    let(:init_hash_dummy) { {'group2' => {'rspec_level' => {'channel' => 'dummy'}}} }
+  describe '#init' do
 
     it 'should create module and method based on input hash' do
       expect { ShoutAt::Group1.rspec_level('hello world') }.to raise_exception NameError
@@ -23,6 +28,25 @@ describe ShoutAt do
       expect{ ShoutAt.init(init_hash_dummy) }.to raise_error ShoutAt::ShoutAtError, "Undefined shouter channel dummy"
     end
 
+  end
+  
+  describe '#rescue_handler' do
+    
+    it 'should log exceptions if no error handler is defined' do
+      ShoutAt.init(init_hash_log)
+      expect_any_instance_of(Logger).to receive(:error).twice
+      expect_any_instance_of( ShoutAt::Shouter ).to receive(:shout).and_raise StandardError
+      ShoutAt::Group1.rspec_level('hello world')
+    end
+  
+    it 'should call the exception handler on exceptions' do
+      ShoutAt.rescue_handler = Proc.new { |exception| Airbrake.notify(exception) }
+      ShoutAt.init(init_hash_log)
+      expect(Airbrake).to receive(:notify).with StandardError
+      expect_any_instance_of( ShoutAt::Shouter ).to receive(:shout).and_raise StandardError
+      ShoutAt::Group1.rspec_level('hello world')
+    end
+    
   end
 
   describe 'SlackShouter' do
