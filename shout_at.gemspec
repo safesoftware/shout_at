@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "pagerduty"
-  spec.add_runtime_dependency "airbrake"
+  spec.add_runtime_dependency "airbrake-ruby", '~> 1.0'
   spec.add_runtime_dependency "slack-notifier"
   spec.add_runtime_dependency "rails", ">= 4.0"
 
