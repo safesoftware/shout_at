@@ -18,6 +18,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
+  spec.required_ruby_version = '>= 2.3.0'
+
   spec.add_runtime_dependency "pagerduty"
   spec.add_runtime_dependency "airbrake-ruby", '~> 1.0'
   spec.add_runtime_dependency "slack-notifier"

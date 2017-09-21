@@ -28,7 +28,7 @@ module ShoutAt
     end
 
     def create_exception_attachment(exception)
-      trace = exception.backtrace.andand.join("\n")
+      trace = exception.backtrace&.join("\n")
       {
           fallback: trace,
           title: exception.message,
