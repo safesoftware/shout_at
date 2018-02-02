@@ -20,8 +20,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.3.0'
 
-  spec.add_runtime_dependency "pagerduty"
-  spec.add_runtime_dependency "airbrake-ruby", '~> 1.0'
+  spec.add_runtime_dependency "pagerduty", '~> 2.0'
+  spec.add_runtime_dependency "airbrake-ruby", '~> 2.0'
   spec.add_runtime_dependency "slack-notifier"
   spec.add_runtime_dependency "rails", ">= 4.0"
 
