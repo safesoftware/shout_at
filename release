@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -e
+
+raise_error(){
+    echo "*ERROR* $1"
+    exit 1
+}
+
+# Git credentials to push version tag
+git config --global user.email "ci@semaphoreci.com"
+git config --global user.name "Semaphore CI"
+
+# Ensure branch is master
+if [[ "$BRANCH_NAME" != "master" ]]; then raise_error "Git branch is not master" ; fi
+
+gem install gem-release --no-rdoc --no-ri
+
+# Make sure the gem builds local
+gem build shout_at.gemspec
+
+gemfile=$(find shout_at-*.gem)
+
+# Push code to Gemfury (and fail if version was not updated)
+if curl -F package=@"$gemfile" https://"$GEMFURY_PUSH_TOKEN"@push.fury.io/safesoftware/ | grep -q "version already exists" ; then
+    raise_error "Version number was not updated"
+else
+    echo "Yay! New gem was released."
+fi
+
+# Push matching tag
+gem tag -p
