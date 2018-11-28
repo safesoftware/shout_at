@@ -57,3 +57,6 @@ crashlytics-build.properties
 /pkg/
 /spec/reports/
 /tmp/
+.DS_Store
+
+shout_at-*.gem
