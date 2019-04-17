@@ -1,5 +1,3 @@
-[![Build Status](https://semaphoreci.com/api/v1/safesoftware/shout_at/branches/master/shields_badge.svg)](https://semaphoreci.com/safesoftware/shout_at)
-
 # ShoutAt
 
 ShoutAt is a centralized notification framework for Ruby to notify different teams with different services based on 
