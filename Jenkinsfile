@@ -33,6 +33,9 @@ spec:
 """
     }
   }
+  options {
+    buildDiscarder(logRotator(daysToKeepStr: '30'))
+  }
   stages {
     stage('Prepare') {
       steps {
